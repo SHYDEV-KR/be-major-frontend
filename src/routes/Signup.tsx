@@ -34,6 +34,7 @@ import {
 	ModalCloseButton,
 } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/react";
+import UnprotectedPage from "../components/UnprotectedPage";
 
 export const Signup = () => {
 	const navigate = useNavigate();
@@ -172,94 +173,90 @@ export const Signup = () => {
 		);
 	};
 
-	if (!userLoading) {
-		if (isLoggedIn) navigate("/");
-		else
-			return (
-				<VStack spacing={3}>
-					<Heading size={"lg"}>가입하기</Heading>
-					<FormControl>
-						<FormLabel>유저명</FormLabel>
+	return (
+		<UnprotectedPage>
+			<VStack spacing={3}>
+				<Heading size={"lg"}>가입하기</Heading>
+				<FormControl>
+					<FormLabel>유저명</FormLabel>
+					<Input
+						type="text"
+						placeholder={"유저명"}
+						isInvalid={Boolean(errors.username?.message)}
+						{...register("username", {
+							required: "유저명을 입력해주세요.",
+						})}
+					/>
+					<FormHelperText>공백과 특수기호는 입력할 수 없습니다.</FormHelperText>
+				</FormControl>
+				<FormControl>
+					<FormLabel>휴대폰 번호</FormLabel>
+					<InputGroup>
 						<Input
 							type="text"
-							placeholder={"유저명"}
-							isInvalid={Boolean(errors.username?.message)}
-							{...register("username", {
-								required: "유저명을 입력해주세요.",
+							placeholder={"01012345678"}
+							isInvalid={Boolean(errors.phone_number?.message)}
+							{...register("phone_number", {
+								required: "휴대폰 번호를 입력해주세요.",
 							})}
+							isDisabled={phoneNumberAuthenticated}
 						/>
-						<FormHelperText>
-							공백과 특수기호는 입력할 수 없습니다.
-						</FormHelperText>
-					</FormControl>
-					<FormControl>
-						<FormLabel>휴대폰 번호</FormLabel>
-						<InputGroup>
-							<Input
-								type="text"
-								placeholder={"01012345678"}
-								isInvalid={Boolean(errors.phone_number?.message)}
-								{...register("phone_number", {
-									required: "휴대폰 번호를 입력해주세요.",
-								})}
-								isDisabled={phoneNumberAuthenticated}
-							/>
-							<InputRightElement
-								w={"fit-content"}
-								children={<SMSAuthModalBtn />}
-							/>
-						</InputGroup>
-						<FormHelperText>"-"없이 입력해주세요.</FormHelperText>
-					</FormControl>
-					<FormControl>
-						<FormLabel>비밀번호</FormLabel>
-						<Input
-							type="password"
-							placeholder={"비밀번호"}
-							isInvalid={Boolean(errors.password?.message)}
-							{...register("password", {
-								required: "비밀번호를 입력해주세요.",
-							})}
+						<InputRightElement
+							w={"fit-content"}
+							children={<SMSAuthModalBtn />}
 						/>
-						<FormHelperText>
-							영문, 숫자 포함 8자리 이상 입력해주세요.
-						</FormHelperText>
-					</FormControl>
-					<FormControl>
-						<FormLabel>비밀번호 확인</FormLabel>
-						<Input
-							type="password"
-							placeholder={"비밀번호 확인"}
-							isInvalid={Boolean(errors.password_confirm?.message)}
-							{...register("password_confirm", {
-								required: "비밀번호를 확인해주세요.",
-								validate: (value: string) => {
-									if (watch("password") != value) {
-										return "비밀번호가 달라요.";
-									}
-								},
-							})}
-						/>
-						<FormHelperText>비밀번호를 한 번 더 입력해주세요.</FormHelperText>
-					</FormControl>
-					<hr />
-					<Link
-						alignSelf={"flex-start"}
-						color={"gray.400"}
-						fontSize={"sm"}
-						as={RouterLink}
-						to={"/signin"}
-					>
-						<Highlight query={"로그인"} styles={{ color: "#8400FF" }}>
-							이미 계정이 있으신가요? 로그인
-						</Highlight>
-					</Link>
-					<StyledButton
-						btnName={"회원가입"}
-						hasArrow={true}
-						onClick={handleSubmit(onSubmit)}
+					</InputGroup>
+					<FormHelperText>"-"없이 입력해주세요.</FormHelperText>
+				</FormControl>
+				<FormControl>
+					<FormLabel>비밀번호</FormLabel>
+					<Input
+						type="password"
+						placeholder={"비밀번호"}
+						isInvalid={Boolean(errors.password?.message)}
+						{...register("password", {
+							required: "비밀번호를 입력해주세요.",
+						})}
 					/>
-				</VStack>
-			);
-	}
+					<FormHelperText>
+						영문, 숫자 포함 8자리 이상 입력해주세요.
+					</FormHelperText>
+				</FormControl>
+				<FormControl>
+					<FormLabel>비밀번호 확인</FormLabel>
+					<Input
+						type="password"
+						placeholder={"비밀번호 확인"}
+						isInvalid={Boolean(errors.password_confirm?.message)}
+						{...register("password_confirm", {
+							required: "비밀번호를 확인해주세요.",
+							validate: (value: string) => {
+								if (watch("password") != value) {
+									return "비밀번호가 달라요.";
+								}
+							},
+						})}
+					/>
+					<FormHelperText>비밀번호를 한 번 더 입력해주세요.</FormHelperText>
+				</FormControl>
+				<hr />
+				<Link
+					alignSelf={"flex-start"}
+					color={"gray.400"}
+					fontSize={"sm"}
+					as={RouterLink}
+					to={"/signin"}
+				>
+					<Highlight query={"로그인"} styles={{ color: "#8400FF" }}>
+						이미 계정이 있으신가요? 로그인
+					</Highlight>
+				</Link>
+				<StyledButton
+					btnName={"회원가입"}
+					hasArrow={true}
+					onClick={handleSubmit(onSubmit)}
+				/>
+			</VStack>
+		</UnprotectedPage>
+	);
 };

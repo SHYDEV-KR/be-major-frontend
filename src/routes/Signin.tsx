@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { phoneNumberLogIn } from "../api";
 import { useToast } from "@chakra-ui/react";
+import unprotectedPage from "../components/UnprotectedPage";
+import UnprotectedPage from "../components/UnprotectedPage";
 
 interface IForm {
 	phone_number: string;
@@ -25,7 +27,6 @@ export const Signin = () => {
 		window.scrollTo(0, 0);
 	}, []);
 	const navigate = useNavigate();
-	const { isLoggedIn, userLoading } = useUserProfile();
 	const {
 		register,
 		handleSubmit,
@@ -54,61 +55,60 @@ export const Signin = () => {
 	const onSubmit = ({ phone_number, password }: IForm) => {
 		mutation.mutate({ phone_number, password });
 	};
-	if (!userLoading) {
-		if (isLoggedIn) navigate("/");
-		else
-			return (
-				<VStack spacing={3} as={"form"} onSubmit={handleSubmit(onSubmit)}>
-					<Heading size={"lg"}>로그인</Heading>
-					<FormControl>
-						<Input
-							type="text"
-							placeholder={"휴대폰 번호"}
-							isInvalid={Boolean(errors.phone_number?.message)}
-							{...register("phone_number", {
-								required: "휴대폰 번호를 입력해주세요.",
-							})}
-						/>
-					</FormControl>
-					<FormControl>
-						<Input
-							type="password"
-							placeholder={"비밀번호"}
-							isInvalid={Boolean(errors.password?.message)}
-							{...register("password", {
-								required: "비밀번호를 입력해주세요.",
-							})}
-						/>
-					</FormControl>
-					<Link
-						alignSelf={"flex-start"}
-						color={"gray.400"}
-						fontSize={"sm"}
-						as={RouterLink}
-						to={"/reset-password"}
-					>
-						비밀번호를 잊으셨나요?
-					</Link>
-					<Link
-						alignSelf={"flex-start"}
-						color={"gray.400"}
-						fontSize={"sm"}
-						as={RouterLink}
-						to={"/signup"}
-					>
-						<Highlight query={"회원가입"} styles={{ color: "#8400FF" }}>
-							계정이 없으신가요? 회원가입
-						</Highlight>
-					</Link>
-					<hr />
-					<StyledButton
-						btnName={"로그인"}
-						hasArrow={true}
-						onClick={handleSubmit(onSubmit)}
-						isLoading={mutation.isLoading}
-						type={"submit"}
+
+	return (
+		<UnprotectedPage>
+			<VStack spacing={3} as={"form"} onSubmit={handleSubmit(onSubmit)}>
+				<Heading size={"lg"}>로그인</Heading>
+				<FormControl>
+					<Input
+						type="text"
+						placeholder={"휴대폰 번호"}
+						isInvalid={Boolean(errors.phone_number?.message)}
+						{...register("phone_number", {
+							required: "휴대폰 번호를 입력해주세요.",
+						})}
 					/>
-				</VStack>
-			);
-	}
+				</FormControl>
+				<FormControl>
+					<Input
+						type="password"
+						placeholder={"비밀번호"}
+						isInvalid={Boolean(errors.password?.message)}
+						{...register("password", {
+							required: "비밀번호를 입력해주세요.",
+						})}
+					/>
+				</FormControl>
+				<Link
+					alignSelf={"flex-start"}
+					color={"gray.400"}
+					fontSize={"sm"}
+					as={RouterLink}
+					to={"/reset-password"}
+				>
+					비밀번호를 잊으셨나요?
+				</Link>
+				<Link
+					alignSelf={"flex-start"}
+					color={"gray.400"}
+					fontSize={"sm"}
+					as={RouterLink}
+					to={"/signup"}
+				>
+					<Highlight query={"회원가입"} styles={{ color: "#8400FF" }}>
+						계정이 없으신가요? 회원가입
+					</Highlight>
+				</Link>
+				<hr />
+				<StyledButton
+					btnName={"로그인"}
+					hasArrow={true}
+					onClick={handleSubmit(onSubmit)}
+					isLoading={mutation.isLoading}
+					type={"submit"}
+				/>
+			</VStack>
+		</UnprotectedPage>
+	);
 };
