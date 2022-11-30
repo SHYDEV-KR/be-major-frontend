@@ -784,11 +784,14 @@ export const MoimDetail = () => {
 												<InputGroup w={"fit-content"}>
 													<Input
 														type="text"
-														value={`${(
+														value={`${Math.floor(
 															data?.target_amount / data?.max_participants
 														)
 															.toString()
-															.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ~ ${(
+															.replace(
+																/\B(?=(\d{3})+(?!\d))/g,
+																","
+															)} ~ ${Math.ceil(
 															data?.target_amount / data?.min_participants
 														)
 															.toString()
