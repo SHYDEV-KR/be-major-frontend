@@ -5,6 +5,10 @@ import { Link as RouterLink } from "react-router-dom";
 import { Button } from "@chakra-ui/button";
 import { SubHeader } from "../components/SubHeader";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getHome } from "../api";
+import { LoadingPage } from "../components/LoadingPage";
+import { Imoim } from "../types";
 
 export default function Home() {
 	const gridColumnSystem = {
@@ -16,72 +20,43 @@ export default function Home() {
 		window.scrollTo(0, 0);
 	}, []);
 
-	const moims = [
-		{
-			id: 1,
-			title: "배민 3년차 PM과 함께 실무능력 A to Z",
-			hasLeader: true,
-			moimTypes: ["커피챗"],
-			topics: ["서비스 기획", "실무스킬"],
-			min: 6,
-			current: 2,
-			expirationDate: "2023-01-01",
-		},
-		{
-			id: 2,
-			title: "같이 개발 스터디합시다.",
-			hasLeader: false,
-			moimTypes: ["스터디"],
-			topics: ["개발", "백엔드"],
-			min: 2,
-			current: 2,
-			expirationDate: "2022-12-29",
-		},
-		{
-			id: 3,
-			title: "같이 개발자랑 커피챗하실분?",
-			hasLeader: false,
-			moimTypes: ["커피챗"],
-			topics: ["개발", "백엔드"],
-			min: 4,
-			current: 1,
-			expirationDate: "2022-11-29",
-		},
-		{
-			id: 4,
-			title: "같이 개발자랑 커피챗하실분?",
-			hasLeader: false,
-			moimTypes: ["커피챗"],
-			topics: ["개발", "백엔드"],
-			min: 4,
-			current: 1,
-			expirationDate: "2022-11-29",
-		},
-	];
+	const { isLoading, data } = useQuery<Imoim[]>(["moims"], getHome);
 
-	return (
-		<VStack position={"relative"}>
-			<SubHeader
-				to={"/moims/create"}
-				btnName={"모임 생성하기"}
-				headerTitle={"홈"}
-				hasBtn={true}
-			/>
-			<Grid templateColumns={gridColumnSystem} gap={6} pt={12}>
-				{moims.map((moim) => (
-					<MoimCard
-						id={moim.id}
-						key={moim.id}
-						title={moim.title}
-						hasLeader={moim.hasLeader}
-						moimTypes={moim.moimTypes}
-						topics={moim.topics}
-						current={moim.current}
-						min={moim.min}
-						expirationDate={moim.expirationDate}
-					/>
-				))}
-			</Grid>
-		</VStack>
-	);
+	if (isLoading) {
+		return <LoadingPage />;
+	} else {
+		return (
+			<VStack position={"relative"}>
+				<SubHeader
+					to={"/moims/create"}
+					btnName={"모임 생성하기"}
+					headerTitle={"홈"}
+					hasBtn={true}
+				/>
+				<Grid templateColumns={gridColumnSystem} gap={6} pt={12}>
+					{data?.map((moim) => {
+						return (
+							<MoimCard
+								id={moim.id}
+								key={moim.id}
+								title={moim.title}
+								hasLeader={moim.has_leader}
+								moimTypes={moim.moim_types}
+								topics={moim.topics}
+								current={moim.current_number_of_participants}
+								min={moim.min_participants}
+								expirationDate={moim.expiration_date}
+							/>
+						);
+					})}
+					{data?.length === 0 ? (
+						<VStack>
+							<Heading fontSize={"2xl"}>모임이 없습니다.</Heading>
+							<Heading fontSize={"lg"}>모임을 만들어보세요!</Heading>
+						</VStack>
+					) : null}
+				</Grid>
+			</VStack>
+		);
+	}
 }
