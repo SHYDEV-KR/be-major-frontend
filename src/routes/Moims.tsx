@@ -532,7 +532,7 @@ export const MoimCreate = () => {
 	};
 
 	if (userLoading) return <LoadingPage />;
-	else if (!isLoggedIn) navigate("/signin");
+	else if (!userLoading && !isLoggedIn) navigate("/signin");
 	else {
 		switch (step) {
 			case 1:

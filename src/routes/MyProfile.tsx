@@ -183,7 +183,7 @@ export const MyPortfolioList = () => {
 	});
 
 	if (isLoading || userLoading) return <LoadingPage />;
-	else if (!isLoggedIn) navigate("/signin");
+	else if (!userLoading && !isLoggedIn) navigate("/signin");
 	else
 		return (
 			<VStack>
