@@ -81,7 +81,7 @@ const router = createBrowserRouter([
 						element: <CrewJoinCreate />,
 					},
 					{
-						path: ":moimId/crew-join/:JoinCrewId/edit",
+						path: ":moimId/crew-join/:crewJoinId/edit",
 						element: <CrewJoinEdit />,
 					},
 				],
@@ -127,6 +127,10 @@ const router = createBrowserRouter([
 				],
 			},
 		],
+	},
+	{
+		path: "not-found",
+		element: <NotFound />,
 	},
 ]);
 
