@@ -10,6 +10,8 @@ interface IStyledButtonProps {
 	hasArrow?: Boolean;
 	btnName: string;
 	btnNameColor?: string;
+	isLoading?: boolean;
+	type?: "button" | "submit" | "reset";
 }
 
 const StyledButton = ({
@@ -19,6 +21,8 @@ const StyledButton = ({
 	hasArrow,
 	btnName,
 	btnNameColor = "white",
+	isLoading,
+	type,
 }: IStyledButtonProps) => {
 	const ArrorBox = () => {
 		if (hasArrow) {
@@ -46,6 +50,8 @@ const StyledButton = ({
 				backgroundColor: "#DEE1E1",
 			}}
 			cursor={"pointer"}
+			isLoading={isLoading}
+			type={type}
 		>
 			{btnName}
 			<ArrorBox />
