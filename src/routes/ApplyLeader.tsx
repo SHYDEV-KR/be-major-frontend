@@ -39,6 +39,7 @@ import {
 	ModalCloseButton,
 } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/react";
+import ProtectedPage from "../components/ProtectedPage";
 
 interface IApplyLeaderForm {
 	portfolioList: {
@@ -166,11 +167,13 @@ export const ApplyLeaderCreate = () => {
 	if (isLoading) return <LoadingPage />;
 	else
 		return (
-			<VStack>
-				<SubHeader headerTitle={"리더 지원서 작성하기"} />
-				<ApplyLeaderForm portfolioList={data} />
-				<StyledButton btnName={"지원서 제출하기"} />
-			</VStack>
+			<ProtectedPage>
+				<VStack>
+					<SubHeader headerTitle={"리더 지원서 작성하기"} />
+					<ApplyLeaderForm portfolioList={data} />
+					<StyledButton btnName={"지원서 제출하기"} />
+				</VStack>
+			</ProtectedPage>
 		);
 };
 
@@ -247,15 +250,17 @@ export const ApplyLeaderEdit = () => {
 	if (isLoading) return <LoadingPage />;
 	else
 		return (
-			<VStack>
-				<SubHeader headerTitle={"리더 지원서 수정하기"} />
-				<ApplyLeaderForm portfolioList={data} />
-				<StyledButton btnName={"수정하기"} />
-				<StyledButton
-					btnName={"지원 취소하기"}
-					themeColor={"#E3E5E5"}
-					btnNameColor={"red"}
-				/>
-			</VStack>
+			<ProtectedPage>
+				<VStack>
+					<SubHeader headerTitle={"리더 지원서 수정하기"} />
+					<ApplyLeaderForm portfolioList={data} />
+					<StyledButton btnName={"수정하기"} />
+					<StyledButton
+						btnName={"지원 취소하기"}
+						themeColor={"#E3E5E5"}
+						btnNameColor={"red"}
+					/>
+				</VStack>
+			</ProtectedPage>
 		);
 };

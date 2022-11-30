@@ -78,6 +78,7 @@ import { LoadingPage } from "../components/LoadingPage";
 import { ImoimDetail, ImoimOwnerDetail } from "../types";
 import useUserProfile from "../lib/useUserProfile";
 import { useForm } from "react-hook-form";
+import ProtectedPage from "../components/ProtectedPage";
 
 export const MoimRoot = () => {
 	return (
@@ -182,12 +183,14 @@ export const MoimCreate = () => {
 	};
 
 	const Base = ({ children }: IBaseProps) => (
-		<VStack>
-			<SubHeader headerTitle={"모임 생성하기"} />
-			<VStack pt={12} w={"100%"} spacing={3}>
-				{children}
+		<ProtectedPage>
+			<VStack>
+				<SubHeader headerTitle={"모임 생성하기"} />
+				<VStack pt={12} w={"100%"} spacing={3}>
+					{children}
+				</VStack>
 			</VStack>
-		</VStack>
+		</ProtectedPage>
 	);
 
 	const Step1 = () => {
@@ -531,31 +534,27 @@ export const MoimCreate = () => {
 		);
 	};
 
-	if (userLoading) return <LoadingPage />;
-	else if (!userLoading && !isLoggedIn) navigate("/signin");
-	else {
-		switch (step) {
-			case 1:
-				return (
-					<Base>
-						<Step1 />
-					</Base>
-				);
-			case 2:
-				return (
-					<Base>
-						<Step2 />
-					</Base>
-				);
-			case 3:
-				return (
-					<Base>
-						<Step3 />
-					</Base>
-				);
-			default:
-				return null;
-		}
+	switch (step) {
+		case 1:
+			return (
+				<Base>
+					<Step1 />
+				</Base>
+			);
+		case 2:
+			return (
+				<Base>
+					<Step2 />
+				</Base>
+			);
+		case 3:
+			return (
+				<Base>
+					<Step3 />
+				</Base>
+			);
+		default:
+			return null;
 	}
 };
 
@@ -578,7 +577,7 @@ export const MoimDetail = () => {
 		window.scrollTo(0, 0);
 	}, []);
 
-	if (isLoading || userLoading) return <LoadingPage />;
+	if (isLoading) return <LoadingPage />;
 	else
 		return (
 			<VStack>
@@ -1125,114 +1124,118 @@ export const MoimOwner = () => {
 	if (isLoading) return <LoadingPage />;
 	else
 		return (
-			<VStack>
-				<SubHeader headerTitle={"모임 관리"} />
-				<VStack pt={12} w={"100%"} spacing={3}>
-					<Tabs
-						isFitted
-						_selected={{ color: "white", bg: '"#6B4EFF"' }}
-						w={"100%"}
-					>
-						<TabList mb="1em">
-							<Tab>크루 신청서 보기</Tab>
-							<Tab>리더 지원서 보기</Tab>
-						</TabList>
-						<TabPanels>
-							<TabPanel px={0}>
-								<Heading size={"md"} pb={3}>
-									현재 참가 신청한 크루 : {data?.joined_crews.length}명
-								</Heading>
-								<VStack
-									spacing={5}
-									h={"350px"}
-									overflow={"hidden"}
-									overflowY={"scroll"}
-									border={"1px solid #DEE3EE"}
-									borderRadius={6}
-								>
-									<Divider />
-									{data?.joined_crews.map((crewJoin) => (
-										<Container key={crewJoin.id}>
-											<HStack
-												justifyContent={"space-between"}
-												width={"100%"}
-												px={6}
-												pb={3}
-											>
-												<VStack alignItems={"flex-start"}>
-													<Text>{crewJoin.owner.user}</Text>
-													<Text fontSize={"sm"} color={"#72777A"}>
-														{crewJoin.description}
-													</Text>
-												</VStack>
-											</HStack>
-											<Divider />
-										</Container>
-									))}
-								</VStack>
-								<Divider pb={6} />
-								<StyledButton btnName={"펀딩 종료하기"} />
-							</TabPanel>
-							<TabPanel px={0}>
-								<Heading size={"md"} pb={3}>
-									현재 지원한 리더 : {data?.applied_leaders.length}명
-								</Heading>
-								<VStack spacing={5} pt={3}>
-									{data?.applied_leaders.map((leaderApply) => (
-										<Container key={leaderApply.id}>
-											<HStack justifyContent={"space-between"}>
-												<VStack alignItems={"flex-start"} w={"100%"}>
-													<VStack
-														alignItems={"flex-start"}
-														w={"100%"}
-														position={"relative"}
-													>
-														<Text>{leaderApply.owner.user}</Text>
+			<ProtectedPage>
+				<VStack>
+					<SubHeader headerTitle={"모임 관리"} />
+					<VStack pt={12} w={"100%"} spacing={3}>
+						<Tabs
+							isFitted
+							_selected={{ color: "white", bg: '"#6B4EFF"' }}
+							w={"100%"}
+						>
+							<TabList mb="1em">
+								<Tab>크루 신청서 보기</Tab>
+								<Tab>리더 지원서 보기</Tab>
+							</TabList>
+							<TabPanels>
+								<TabPanel px={0}>
+									<Heading size={"md"} pb={3}>
+										현재 참가 신청한 크루 : {data?.joined_crews.length}명
+									</Heading>
+									<VStack
+										spacing={5}
+										h={"350px"}
+										overflow={"hidden"}
+										overflowY={"scroll"}
+										border={"1px solid #DEE3EE"}
+										borderRadius={6}
+									>
+										<Divider />
+										{data?.joined_crews.map((crewJoin) => (
+											<Container key={crewJoin.id}>
+												<HStack
+													justifyContent={"space-between"}
+													width={"100%"}
+													px={6}
+													pb={3}
+												>
+													<VStack alignItems={"flex-start"}>
+														<Text>{crewJoin.owner.user}</Text>
 														<Text fontSize={"sm"} color={"#72777A"}>
-															{leaderApply.description}
+															{crewJoin.description}
 														</Text>
-														<LeaderSetModal
-															id={leaderApply.owner.id}
-															username={leaderApply.owner.user}
-														/>
 													</VStack>
-													<Accordion allowToggle w={"100%"}>
-														<AccordionItem>
-															<h2>
-																<AccordionButton>
-																	<Box flex="1" textAlign="left">
-																		{leaderApply.owner.user}의 포트폴리오 보기
-																	</Box>
-																	<AccordionIcon />
-																</AccordionButton>
-															</h2>
-															<AccordionPanel pb={4} px={0}>
-																<VStack>
-																	{leaderApply.portfolios.map((portfolio) => (
-																		<PortfolioCard
-																			key={portfolio.id}
-																			id={portfolio.id}
-																			title={portfolio.title}
-																			description={portfolio.short_description}
-																			url={portfolio.url}
-																			viewOnly={true}
-																		/>
-																	))}
-																</VStack>
-															</AccordionPanel>
-														</AccordionItem>
-													</Accordion>
-												</VStack>
-											</HStack>
-											<Divider />
-										</Container>
-									))}
-								</VStack>
-								<Divider />
-							</TabPanel>
-						</TabPanels>
-					</Tabs>
+												</HStack>
+												<Divider />
+											</Container>
+										))}
+									</VStack>
+									<Divider pb={6} />
+									<StyledButton btnName={"펀딩 종료하기"} />
+								</TabPanel>
+								<TabPanel px={0}>
+									<Heading size={"md"} pb={3}>
+										현재 지원한 리더 : {data?.applied_leaders.length}명
+									</Heading>
+									<VStack spacing={5} pt={3}>
+										{data?.applied_leaders.map((leaderApply) => (
+											<Container key={leaderApply.id}>
+												<HStack justifyContent={"space-between"}>
+													<VStack alignItems={"flex-start"} w={"100%"}>
+														<VStack
+															alignItems={"flex-start"}
+															w={"100%"}
+															position={"relative"}
+														>
+															<Text>{leaderApply.owner.user}</Text>
+															<Text fontSize={"sm"} color={"#72777A"}>
+																{leaderApply.description}
+															</Text>
+															<LeaderSetModal
+																id={leaderApply.owner.id}
+																username={leaderApply.owner.user}
+															/>
+														</VStack>
+														<Accordion allowToggle w={"100%"}>
+															<AccordionItem>
+																<h2>
+																	<AccordionButton>
+																		<Box flex="1" textAlign="left">
+																			{leaderApply.owner.user}의 포트폴리오 보기
+																		</Box>
+																		<AccordionIcon />
+																	</AccordionButton>
+																</h2>
+																<AccordionPanel pb={4} px={0}>
+																	<VStack>
+																		{leaderApply.portfolios.map((portfolio) => (
+																			<PortfolioCard
+																				key={portfolio.id}
+																				id={portfolio.id}
+																				title={portfolio.title}
+																				description={
+																					portfolio.short_description
+																				}
+																				url={portfolio.url}
+																				viewOnly={true}
+																			/>
+																		))}
+																	</VStack>
+																</AccordionPanel>
+															</AccordionItem>
+														</Accordion>
+													</VStack>
+												</HStack>
+												<Divider />
+											</Container>
+										))}
+									</VStack>
+									<Divider />
+								</TabPanel>
+							</TabPanels>
+						</Tabs>
+					</VStack>
 				</VStack>
-			</VStack>
+			</ProtectedPage>
 		);
 };

@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { getCrewJoin, postCrewJoin } from "../api";
 import { LoadingPage } from "../components/LoadingPage";
+import ProtectedPage from "../components/ProtectedPage";
 import StyledButton from "../components/StyledButton";
 import useUserProfile from "../lib/useUserProfile";
 import { IcrewJoin } from "../types";
@@ -27,7 +28,6 @@ export const CrewJoinCreate = () => {
 	}, []);
 	const { moimId } = useParams();
 	const navigate = useNavigate();
-	const { isLoggedIn, userLoading } = useUserProfile();
 	const {
 		register,
 		handleSubmit,
@@ -55,31 +55,31 @@ export const CrewJoinCreate = () => {
 		mutation.mutate({ description, moimId });
 	};
 
-	if (!isLoggedIn) navigate("/signin");
-	if (userLoading) return <LoadingPage />;
 	return (
-		<VStack spacing={3}>
-			<Heading size={"md"}>모임 신청서 작성하기</Heading>
-			<FormControl>
-				<FormLabel>하고 싶은 말</FormLabel>
-				<Textarea
-					placeholder={"하고 싶은 말"}
-					isInvalid={Boolean(errors.description?.message)}
-					{...register("description", {
-						required: "하고 싶은 말을 입력해주세요.",
-					})}
+		<ProtectedPage>
+			<VStack spacing={3}>
+				<Heading size={"md"}>모임 신청서 작성하기</Heading>
+				<FormControl>
+					<FormLabel>하고 싶은 말</FormLabel>
+					<Textarea
+						placeholder={"하고 싶은 말"}
+						isInvalid={Boolean(errors.description?.message)}
+						{...register("description", {
+							required: "하고 싶은 말을 입력해주세요.",
+						})}
+					/>
+					<FormHelperText>
+						어떤 동기에서 모임을 신청하는지 작성해주세요.
+					</FormHelperText>
+				</FormControl>
+				<hr />
+				<StyledButton
+					btnName={"신청하기"}
+					onClick={handleSubmit(onSubmit)}
+					isLoading={mutation.isLoading}
 				/>
-				<FormHelperText>
-					어떤 동기에서 모임을 신청하는지 작성해주세요.
-				</FormHelperText>
-			</FormControl>
-			<hr />
-			<StyledButton
-				btnName={"신청하기"}
-				onClick={handleSubmit(onSubmit)}
-				isLoading={mutation.isLoading}
-			/>
-		</VStack>
+			</VStack>
+		</ProtectedPage>
 	);
 };
 
@@ -127,28 +127,29 @@ export const CrewJoinEdit = () => {
 	// 	mutation.mutate({ description });
 	// };
 
-	if (!isLoggedIn) navigate("/signin");
-	if (isLoading || userLoading) return <LoadingPage />;
+	if (isLoading) return <LoadingPage />;
 	return (
-		<VStack spacing={3}>
-			<Heading size={"md"}>모임 신청서 수정하기</Heading>
-			<FormControl>
-				<FormLabel>하고 싶은 말</FormLabel>
-				<Textarea
-					placeholder={"하고 싶은 말"}
-					defaultValue={data?.description}
+		<ProtectedPage>
+			<VStack spacing={3}>
+				<Heading size={"md"}>모임 신청서 수정하기</Heading>
+				<FormControl>
+					<FormLabel>하고 싶은 말</FormLabel>
+					<Textarea
+						placeholder={"하고 싶은 말"}
+						defaultValue={data?.description}
+					/>
+					<FormHelperText>
+						어떤 동기에서 모임을 신청하는지 작성해주세요.
+					</FormHelperText>
+				</FormControl>
+				<hr />
+				<StyledButton btnName={"저장하기"} />
+				<StyledButton
+					btnName={"신청 취소하기"}
+					themeColor={"#E3E5E5"}
+					btnNameColor={"red"}
 				/>
-				<FormHelperText>
-					어떤 동기에서 모임을 신청하는지 작성해주세요.
-				</FormHelperText>
-			</FormControl>
-			<hr />
-			<StyledButton btnName={"저장하기"} />
-			<StyledButton
-				btnName={"신청 취소하기"}
-				themeColor={"#E3E5E5"}
-				btnNameColor={"red"}
-			/>
-		</VStack>
+			</VStack>
+		</ProtectedPage>
 	);
 };

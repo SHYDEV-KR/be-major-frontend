@@ -41,12 +41,15 @@ import {
 import { LoadingPage } from "../components/LoadingPage";
 import { ImoimDetail, Iportfolio } from "../types";
 import { useQuery } from "@tanstack/react-query";
+import ProtectedPage from "../components/ProtectedPage";
 
 export const MyProfileRoot = () => {
 	return (
-		<Box minW={"327px"}>
-			<Outlet />
-		</Box>
+		<ProtectedPage>
+			<Box minW={"327px"}>
+				<Outlet />
+			</Box>
+		</ProtectedPage>
 	);
 };
 
@@ -89,80 +92,72 @@ export const MyProfile = () => {
 		</Modal>
 	);
 
-	const { isLoggedIn, userLoading, user } = useUserProfile();
-	const navigate = useNavigate();
-	if (!isLoggedIn) navigate("/signin");
-	else if (userLoading) return <LoadingPage />;
-	else
-		return (
-			<VStack>
-				<SubHeader headerTitle={"내 프로필"} />
-				<HStack justifyContent={"space-between"} width={"100%"} pt={12}>
-					<HStack>
-						<Image
-							src={user?.avatar !== "" ? user?.avatar : "/logo.png"}
-							borderRadius={"50%"}
-							width={"40px"}
-							height={"40px"}
-							border={"1px solid #DCDCDC"}
-						></Image>
-						<VStack alignItems={"flex-start"} spacing={0} pl={1}>
-							<Text>{user?.user.username}</Text>
-							<Text color={"#72777A"}>{user?.user.phone_number}</Text>
-						</VStack>
-					</HStack>
-					<Button
-						size={"xs"}
-						bg={"#5538EE"}
-						color={"white"}
-						borderRadius={12}
-						px={3}
-						onClick={onOpen}
-					>
-						내 모임
-					</Button>
-					<BtnModal />
+	const { user } = useUserProfile();
+	return (
+		<VStack>
+			<SubHeader headerTitle={"내 프로필"} />
+			<HStack justifyContent={"space-between"} width={"100%"} pt={12}>
+				<HStack>
+					<Image
+						src={user?.avatar !== "" ? user?.avatar : "/logo.png"}
+						borderRadius={"50%"}
+						width={"40px"}
+						height={"40px"}
+						border={"1px solid #DCDCDC"}
+					></Image>
+					<VStack alignItems={"flex-start"} spacing={0} pl={1}>
+						<Text>{user?.user.username}</Text>
+						<Text color={"#72777A"}>{user?.user.phone_number}</Text>
+					</VStack>
 				</HStack>
-				<VStack w={"100%"} spacing={3}>
-					<FormControl>
-						<FormLabel>전공</FormLabel>
-						<Input
-							type="text"
-							placeholder={"전공"}
-							defaultValue={user?.major}
-						/>
-					</FormControl>
-					<FormControl>
-						<FormLabel>이메일</FormLabel>
-						<Input
-							type="email"
-							placeholder={"이메일"}
-							defaultValue={user?.email}
-						/>
-					</FormControl>
-					<FormControl>
-						<FormLabel>성별</FormLabel>
-						<Select defaultValue={user?.gender}>
-							<option value="male">남자</option>
-							<option value="female">여자</option>
-							<option value="else">기타</option>
-						</Select>
-					</FormControl>
-					<FormControl>
-						<FormLabel>생년월일</FormLabel>
-						<Input type="date" defaultValue={user?.date_of_birth} />
-					</FormControl>
-					<StyledButton btnName={"프로필 저장"} />
-					<Link
-						as={RouterLink}
-						to={"portfolios"}
-						_hover={{ textDecoration: "none" }}
-					>
-						<StyledButton btnName={"포트폴리오 관리"} />
-					</Link>
-				</VStack>
+				<Button
+					size={"xs"}
+					bg={"#5538EE"}
+					color={"white"}
+					borderRadius={12}
+					px={3}
+					onClick={onOpen}
+				>
+					내 모임
+				</Button>
+				<BtnModal />
+			</HStack>
+			<VStack w={"100%"} spacing={3}>
+				<FormControl>
+					<FormLabel>전공</FormLabel>
+					<Input type="text" placeholder={"전공"} defaultValue={user?.major} />
+				</FormControl>
+				<FormControl>
+					<FormLabel>이메일</FormLabel>
+					<Input
+						type="email"
+						placeholder={"이메일"}
+						defaultValue={user?.email}
+					/>
+				</FormControl>
+				<FormControl>
+					<FormLabel>성별</FormLabel>
+					<Select defaultValue={user?.gender}>
+						<option value="male">남자</option>
+						<option value="female">여자</option>
+						<option value="else">기타</option>
+					</Select>
+				</FormControl>
+				<FormControl>
+					<FormLabel>생년월일</FormLabel>
+					<Input type="date" defaultValue={user?.date_of_birth} />
+				</FormControl>
+				<StyledButton btnName={"프로필 저장"} />
+				<Link
+					as={RouterLink}
+					to={"portfolios"}
+					_hover={{ textDecoration: "none" }}
+				>
+					<StyledButton btnName={"포트폴리오 관리"} />
+				</Link>
 			</VStack>
-		);
+		</VStack>
+	);
 };
 
 export const MyPortfolioList = () => {
@@ -174,16 +169,11 @@ export const MyPortfolioList = () => {
 		sm: "repeat(1, 1fr)",
 	};
 
-	const { isLoggedIn, userLoading, user } = useUserProfile();
-	const navigate = useNavigate();
-
 	const { isLoading, data } = useQuery<Iportfolio[]>({
 		queryKey: [`my-profile`, `portfolios`],
 		queryFn: getMyPortfolios,
 	});
-
-	if (isLoading || userLoading) return <LoadingPage />;
-	else if (!userLoading && !isLoggedIn) navigate("/signin");
+	if (isLoading) return <LoadingPage />;
 	else
 		return (
 			<VStack>
@@ -314,38 +304,39 @@ export const MyMoimListAsOwner = () => {
 	);
 
 	if (isLoading) return <LoadingPage />;
-	return (
-		<VStack spacing={6}>
-			<SubHeader headerTitle={`내가 생성한 모임`} />
-			<Grid pt={12} width={"100%"} gridTemplateColumns={"1fr"} gap={6}>
-				<VStack>
-					{data ? (
-						data?.map((moim) => (
-							<MoimCardNoImage
-								key={moim.id}
-								id={moim.id}
-								title={moim.title}
-								topics={moim.topics}
-								moimTypes={moim.moim_types}
-								hasLeader={moim.has_leader}
-								isClosed={moim.is_closed}
-								min={moim.min_participants}
-								current={moim.current_number_of_participants}
-								expirationDate={moim.expiration_date}
-								isCrew={moim.is_crew}
-								isLeader={moim.is_leader}
-								isOwner={moim.is_owner}
-								typeOfPage={"owner"}
-								hasApplied={moim.has_applied}
-							/>
-						))
-					) : (
-						<VStack alignItems={"center"}>
-							<Heading size={"md"}>생성한 모임이 없습니다!</Heading>
-						</VStack>
-					)}
-				</VStack>
-			</Grid>
-		</VStack>
-	);
+	else
+		return (
+			<VStack spacing={6}>
+				<SubHeader headerTitle={`내가 생성한 모임`} />
+				<Grid pt={12} width={"100%"} gridTemplateColumns={"1fr"} gap={6}>
+					<VStack>
+						{data ? (
+							data?.map((moim) => (
+								<MoimCardNoImage
+									key={moim.id}
+									id={moim.id}
+									title={moim.title}
+									topics={moim.topics}
+									moimTypes={moim.moim_types}
+									hasLeader={moim.has_leader}
+									isClosed={moim.is_closed}
+									min={moim.min_participants}
+									current={moim.current_number_of_participants}
+									expirationDate={moim.expiration_date}
+									isCrew={moim.is_crew}
+									isLeader={moim.is_leader}
+									isOwner={moim.is_owner}
+									typeOfPage={"owner"}
+									hasApplied={moim.has_applied}
+								/>
+							))
+						) : (
+							<VStack alignItems={"center"}>
+								<Heading size={"md"}>생성한 모임이 없습니다!</Heading>
+							</VStack>
+						)}
+					</VStack>
+				</Grid>
+			</VStack>
+		);
 };
