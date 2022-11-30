@@ -344,7 +344,9 @@ export const MoimCreate = () => {
 						max={20}
 						step={1}
 						onChangeEnd={([min, max]) => {
-							setParticipantLimit({ ...participantsLimit, min: min, max: max });
+							setParticipantLimit({ min: min, max: max });
+							setValue("min_participants", min);
+							setValue("max_participants", max);
 						}}
 					>
 						<RangeSliderTrack bg="#E3E5E5">
