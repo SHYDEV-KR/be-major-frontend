@@ -10,28 +10,95 @@ import {
 	Grid,
 	Heading,
 	HStack,
+	Link,
 	Text,
 	VStack,
+	Box,
+	Container,
 } from "@chakra-ui/layout";
 import { Radio, RadioGroup } from "@chakra-ui/radio";
 import { Textarea } from "@chakra-ui/textarea";
+import { useQuery } from "@tanstack/react-query";
 import { Children, useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
+import { getMyPortfolios, getEditLeaderApply, getLeaderApply } from "../api";
+import { LoadingPage } from "../components/LoadingPage";
 import { PortfolioCard } from "../components/PortfolioCard";
 import StyledButton from "../components/StyledButton";
 import { SubHeader } from "../components/SubHeader";
+import useUserProfile from "../lib/useUserProfile";
+import { IleaderApply, Iportfolio } from "../types";
+import { Button } from "@chakra-ui/button";
+import {
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+} from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 
 interface IApplyLeaderForm {
 	portfolioList: {
 		id: number;
 		title: string;
+		short_description: string;
 		url: string;
 	}[];
 }
 
+interface IPortfolioCardModalBtn {
+	id: number;
+	title: string;
+	short_description: string;
+	url: string;
+}
+
+const PortfolioCardModalBtn = ({
+	id,
+	title,
+	short_description,
+	url,
+}: IPortfolioCardModalBtn) => {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	return (
+		<>
+			<Button variant={"link"} onClick={onOpen}>
+				{title}
+			</Button>
+			<Modal isOpen={isOpen} onClose={onClose}>
+				<ModalOverlay />
+				<ModalContent pb={3}>
+					<ModalCloseButton />
+					<ModalHeader>포트폴리오 상세</ModalHeader>
+					<ModalBody borderRadius={15} as={VStack} alignItems={"flex-start"}>
+						<Heading size={"md"}>{title}</Heading>
+						<Link color={"blue.400"}>{url}</Link>
+						<Divider />
+						<Heading pt={3} size={"sm"}>
+							포트폴리오 설명
+						</Heading>
+						<Box
+							p={6}
+							border={"1px solid #DCDCDC"}
+							borderRadius={15}
+							width={"100%"}
+							h={"max-content"}
+						>
+							{short_description}
+						</Box>
+					</ModalBody>
+				</ModalContent>
+			</Modal>
+		</>
+	);
+};
+
 const ApplyLeaderForm = ({ portfolioList }: IApplyLeaderForm) => {
 	return (
-		<VStack spacing={3}>
-			<Heading size={"md"}>리더 지원서 작성하기</Heading>
+		<VStack spacing={3} pt={12}>
 			<FormControl>
 				<FormLabel>하고 싶은 말</FormLabel>
 				<Textarea placeholder={"하고 싶은 말"} />
@@ -52,15 +119,15 @@ const ApplyLeaderForm = ({ portfolioList }: IApplyLeaderForm) => {
 					<CheckboxGroup>
 						<Divider />
 						{portfolioList.map((portfolio) => (
-							<>
-								<HStack
-									justifyContent={"space-between"}
-									key={portfolio.id}
-									width={"100%"}
-									px={6}
-								>
+							<Container key={portfolio.id} px={6} mt={0}>
+								<HStack justifyContent={"space-between"} width={"100%"} pb={3}>
 									<VStack alignItems={"flex-start"}>
-										<Text>{portfolio.title}</Text>
+										<PortfolioCardModalBtn
+											id={portfolio.id}
+											title={portfolio.title}
+											url={portfolio.url}
+											short_description={portfolio.short_description}
+										/>
 										<Text fontSize={"14px"} color={"#72777A"}>
 											{portfolio.url}
 										</Text>
@@ -71,7 +138,7 @@ const ApplyLeaderForm = ({ portfolioList }: IApplyLeaderForm) => {
 									></Checkbox>
 								</HStack>
 								<Divider />
-							</>
+							</Container>
 						))}
 					</CheckboxGroup>
 				</VStack>
@@ -84,50 +151,27 @@ const ApplyLeaderForm = ({ portfolioList }: IApplyLeaderForm) => {
 	);
 };
 
-const PortfolioListExample = [
-	{
-		id: 1,
-		title: "title1",
-		url: "http://naver.com",
-	},
-	{
-		id: 2,
-		title: "title2",
-		url: "http://google.com",
-	},
-	{
-		id: 3,
-		title: "title3",
-		url: "http://naver.com",
-	},
-	{
-		id: 4,
-		title: "title4",
-		url: "http://google.com",
-	},
-	{
-		id: 5,
-		title: "title5",
-		url: "http://naver.com",
-	},
-	{
-		id: 6,
-		title: "title6",
-		url: "http://google.com",
-	},
-];
-
 export const ApplyLeaderCreate = () => {
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, []);
 
-	return (
-		<VStack>
-			<ApplyLeaderForm portfolioList={PortfolioListExample} />
-			<StyledButton btnName={"지원서 제출하기"} />
-		</VStack>
-	);
+	const { moimId } = useParams();
+
+	const { isLoading, data } = useQuery<Iportfolio[]>({
+		queryKey: [`moims`, moimId, `apply-leader`, `create`],
+		queryFn: getMyPortfolios,
+	});
+
+	if (isLoading) return <LoadingPage />;
+	else
+		return (
+			<VStack>
+				<SubHeader headerTitle={"리더 지원서 작성하기"} />
+				<ApplyLeaderForm portfolioList={data} />
+				<StyledButton btnName={"지원서 제출하기"} />
+			</VStack>
+		);
 };
 
 export const ApplyLeaderDetail = () => {
@@ -135,67 +179,57 @@ export const ApplyLeaderDetail = () => {
 		window.scrollTo(0, 0);
 	}, []);
 
-	const leaderApplyExample = {
-		id: 1,
-		moim: 1,
-		owner: {
-			username: "류지현",
-			avatar: "/logo.png",
-		},
-		description:
-			"열심히 하겠습니다 꼭 뽑아주십쇼! 첫눈에 반한다는 소설같은 이야기 요즘 누가 믿나요. 내 포폴입니다. 드디어 찾아온, 포폴이다~~~~ 그냥 느낌으로 알아 말도 안되지만 이 순간만을 위해 살아온 것같아~~첫눈에 반한다는 소설같은 이야기 요즘 누가 믿나요. 내 포폴입니다. 드디어 찾아온, 포폴이다~~~~ 그냥 느낌으로 알아 말도 안되지만 이 순간만을 위해 살아온 것같아~~첫눈에 반한다는 소설같",
-		portfolios: [
-			{
-				id: 1,
-				title: "포폴1",
-				description:
-					"첫눈에 반한다는 소설같은 이야기 요즘 누가 믿나요. 내 포폴입니다. 드디어 찾아온, 포폴이다~~~~ 그냥 느낌으로 알아 말도 안되지만 이 순간만을 위해 살아온 것같아~~첫눈에 반한다는 소설같은 이야기 요즘 누가 믿나요. 내 포폴입니다. 드디어 찾아온, 포폴이다~~~~ 그냥 느낌으로 알아 말도 안되지만 이 순간만을 위해 살아온 것같아~~첫눈에 반한다는 소설같",
-				url: "https://naver.com",
-			},
-			{
-				id: 2,
-				title: "포폴2입니다.",
-				description: "이번엔 짧은 설명이지롱",
-				url: "https://google.com",
-			},
-		],
-	};
+	const { moimId, leaderApplyId } = useParams();
+	const navigate = useNavigate();
 
-	return (
-		<VStack spacing={6}>
-			<SubHeader
-				headerTitle={`${leaderApplyExample.owner.username}님의 리더 지원서`}
-			/>
-			<Grid
-				pt={12}
-				width={"100%"}
-				gridTemplateColumns={{ sm: "1fr", md: "1fr 1fr" }}
-				gap={6}
-			>
-				<VStack>
-					<Heading size={"md"} alignSelf={"flex-start"}>
-						하고 싶은 말
-					</Heading>
-					<Textarea value={leaderApplyExample.description} width={"100%"} />
-				</VStack>
-				<VStack>
-					<Heading size={"md"} alignSelf={"flex-start"}>
-						제출한 포트폴리오
-					</Heading>
-					{leaderApplyExample.portfolios.map((portfolio) => (
-						<PortfolioCard
-							key={portfolio.id}
-							id={portfolio.id}
-							title={portfolio.title}
-							description={portfolio.description}
-							url={portfolio.url}
-							viewOnly={true}
-						/>
-					))}
-				</VStack>
-			</Grid>
-		</VStack>
-	);
+	const { isLoading, data } = useQuery<IleaderApply>({
+		queryKey: [`moims`, moimId, `apply-leader`, leaderApplyId],
+		queryFn: () => getLeaderApply(leaderApplyId),
+		onError: () => navigate("/not-found"),
+		retry: false,
+	});
+
+	if (isLoading) return <LoadingPage />;
+	else
+		return (
+			<VStack spacing={6}>
+				<SubHeader headerTitle={`${data?.owner.user}님의 리더 지원서`} />
+				<Grid
+					pt={12}
+					width={"100%"}
+					gridTemplateColumns={{ sm: "1fr", md: "1fr 1fr" }}
+					gap={6}
+				>
+					<VStack>
+						<Heading size={"md"} alignSelf={"flex-start"}>
+							하고 싶은 말
+						</Heading>
+						<Box
+							p={6}
+							border={"1px solid #DCDCDC"}
+							borderRadius={15}
+							width={"100%"}
+							h={"max-content"}
+						>
+							{data?.description}
+						</Box>
+					</VStack>
+					<VStack alignItems={"flex-start"}>
+						<Heading size={"md"}>제출한 포트폴리오</Heading>
+						{data?.portfolios.map((portfolio) => (
+							<PortfolioCard
+								key={portfolio.id}
+								id={portfolio.id}
+								title={portfolio.title}
+								description={portfolio.short_description}
+								url={portfolio.url}
+								viewOnly={true}
+							/>
+						))}
+					</VStack>
+				</Grid>
+			</VStack>
+		);
 };
 
 export const ApplyLeaderEdit = () => {
@@ -203,15 +237,25 @@ export const ApplyLeaderEdit = () => {
 		window.scrollTo(0, 0);
 	}, []);
 
-	return (
-		<VStack>
-			<ApplyLeaderForm portfolioList={PortfolioListExample} />
-			<StyledButton btnName={"수정하기"} />
-			<StyledButton
-				btnName={"지원 취소하기"}
-				themeColor={"#E3E5E5"}
-				btnNameColor={"red"}
-			/>
-		</VStack>
-	);
+	const { moimId, leaderApplyId } = useParams();
+
+	const { isLoading, data } = useQuery<Iportfolio[]>({
+		queryKey: [`moims`, moimId, `apply-leader`, leaderApplyId, `edit`],
+		queryFn: getEditLeaderApply, // 이거 바꿔야함
+	});
+
+	if (isLoading) return <LoadingPage />;
+	else
+		return (
+			<VStack>
+				<SubHeader headerTitle={"리더 지원서 수정하기"} />
+				<ApplyLeaderForm portfolioList={data} />
+				<StyledButton btnName={"수정하기"} />
+				<StyledButton
+					btnName={"지원 취소하기"}
+					themeColor={"#E3E5E5"}
+					btnNameColor={"red"}
+				/>
+			</VStack>
+		);
 };
