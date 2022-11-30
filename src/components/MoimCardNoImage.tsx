@@ -1,24 +1,7 @@
 import { Card, CardHeader, CardBody, CardFooter, Tag } from "@chakra-ui/react";
 import { Heading, HStack, Link, Stack, Text } from "@chakra-ui/layout";
 import { Link as RouterLink } from "react-router-dom";
-
-interface IMoimCardProps {
-	id: number;
-	hasLeader: Boolean;
-	isClosed: Boolean;
-	title: string;
-	moimTypes: string[];
-	topics: string[];
-	leader?: {};
-	expirationDate: string;
-	current: number;
-	min: number;
-	hasApplied: Boolean;
-	isCrew: Boolean;
-	isLeader: Boolean;
-	isOwner: Boolean;
-	typeOfPage: string;
-}
+import { IMoimCardNoImageProps } from "../types";
 
 export const MoimCardNoImage = ({
 	id,
@@ -35,7 +18,7 @@ export const MoimCardNoImage = ({
 	isLeader,
 	isOwner,
 	typeOfPage,
-}: IMoimCardProps) => {
+}: IMoimCardNoImageProps) => {
 	const remainDays = Math.ceil(
 		(new Date(expirationDate).getTime() - new Date().getTime()) /
 			(1000 * 60 * 60 * 24)
@@ -142,9 +125,9 @@ export const MoimCardNoImage = ({
 						<HStack>
 							{moimTypes.map((moimType, key) => (
 								<Tag
+									key={key}
 									borderRadius={100}
 									fontSize={"xs"}
-									key={key}
 									bg={"#6B4EFF"}
 									color={"white"}
 								>

@@ -2,18 +2,7 @@ import { Card, CardHeader, CardBody, CardFooter, Tag } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/image";
 import { Heading, HStack, Link, Stack, Text } from "@chakra-ui/layout";
 import { Link as RouterLink } from "react-router-dom";
-
-interface IMoimCardProps {
-	id: number;
-	hasLeader: Boolean;
-	title: string;
-	moimTypes: string[];
-	topics: string[];
-	leader?: {};
-	current: number;
-	min: number;
-	expirationDate: string;
-}
+import { IMoimCardProps } from "../types";
 
 export const MoimCard = ({
 	id,
@@ -44,8 +33,8 @@ export const MoimCard = ({
 				bg={"#F9F9FA"}
 			>
 				<Image
-					src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-					alt="Green double couch with wooden legs"
+					src={`/img/moim_thumbnails/${topics[0]}.png`}
+					alt={`${topics[0]}`}
 					borderRadius={15}
 					boxSize={"sm"}
 					maxH={48}
@@ -54,7 +43,7 @@ export const MoimCard = ({
 					<Stack spacing="3">
 						{hasLeader ? (
 							<>
-								<Heading size="sm" mt={"16px"}>
+								<Heading size="sm" mt={"16px"} noOfLines={1}>
 									{title}
 								</Heading>
 							</>

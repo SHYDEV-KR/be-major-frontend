@@ -22,11 +22,12 @@ export const PortfolioCard = ({
 	const navigate = useNavigate();
 	return (
 		<Card
-			w="327px"
+			w="100%"
 			minH={"100px"}
 			maxH={"max-content"}
 			borderRadius={15}
 			bg={"#E7E7FF"}
+			pb={3}
 		>
 			<CardHeader pb={2}>
 				{!viewOnly ? (
@@ -57,8 +58,8 @@ export const PortfolioCard = ({
 					{url}
 				</Link>
 			</CardHeader>
-			<CardBody pt={1} pb={6} minH={"64px"}>
-				<Text fontSize={"xs"} noOfLines={[2]} color={"gray.500"}>
+			<CardBody pt={1} minH="64px" maxH={"64px"} overflowY={"scroll"}>
+				<Text fontSize={"xs"} color={"gray.500"}>
 					{description}
 				</Text>
 			</CardBody>
