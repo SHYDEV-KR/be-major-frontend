@@ -3,7 +3,10 @@ import { QueryFunctionContext } from "@tanstack/query-core";
 import Cookie from "js-cookie";
 
 const instance = axios.create({
-	baseURL: "http://127.0.0.1:8000/api/v1/",
+	baseURL:
+		process.env.NODE_ENV === "development"
+			? "http://127.0.0.1:8000/api/v1/"
+			: "https://be-major.onrender.com/api/v1/",
 	withCredentials: true,
 });
 
