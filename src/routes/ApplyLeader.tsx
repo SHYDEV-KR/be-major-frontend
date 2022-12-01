@@ -158,10 +158,20 @@ export const ApplyLeaderCreate = () => {
 	}, []);
 
 	const { moimId } = useParams();
+	const { isLoggedIn, userLoading } = useUserProfile();
+	const navigate = useNavigate();
+	useEffect(() => {
+		if (!userLoading) {
+			if (!isLoggedIn) {
+				navigate("/signin");
+			}
+		}
+	}, [userLoading, isLoggedIn, navigate]);
 
 	const { isLoading, data } = useQuery<Iportfolio[]>({
 		queryKey: [`moims`, moimId, `apply-leader`, `create`],
 		queryFn: getMyPortfolios,
+		retry: false,
 	});
 
 	if (isLoading) return <LoadingPage />;
