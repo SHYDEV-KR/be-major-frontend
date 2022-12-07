@@ -11,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ onOpen }: HeaderProps) => {
 	const { userLoading, isLoggedIn, user } = useUserProfile();
+
 	if (!userLoading) {
 		return (
 			<HStack
@@ -25,7 +26,9 @@ const Header = ({ onOpen }: HeaderProps) => {
 				<HStack
 					my={"10px"}
 					ml={6}
-					mr={9}
+					mr={
+						document.documentElement.clientWidth === window.innerWidth ? 6 : 9
+					}
 					position={"relative"}
 					justifyContent={"center"}
 					width={"100vw"}
