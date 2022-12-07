@@ -62,6 +62,7 @@ export default function Root() {
 										py={1}
 										_hover={{ bg: "#DCDCDC" }}
 										onClick={() => {
+											onClose();
 											navigate("/my-profile/moims/crew");
 										}}
 									>
