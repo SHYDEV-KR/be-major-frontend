@@ -20,13 +20,15 @@ const Header = ({ onOpen }: HeaderProps) => {
 				right={0}
 				bgColor={"white"}
 				zIndex={999}
+				width={"100vw"}
 			>
 				<HStack
 					my={"10px"}
-					mx={6}
+					ml={6}
+					mr={9}
 					position={"relative"}
 					justifyContent={"center"}
-					width={"100%"}
+					width={"100vw"}
 				>
 					<IconButton
 						aria-label="Menu"
